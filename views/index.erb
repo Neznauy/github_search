@@ -5,3 +5,13 @@
   </div>
   <button type="submit" class="btn">Search!</button>
 </form>
+
+<% if @error.nil? %>
+  <% @result.each do |r| %>
+    <p>
+      <a href="<%= r["html_url"]%>"><%= r["full_name"]%></a>
+    </p>
+  <% end %>
+<% else %>
+  <p> <%= @error %> </p>
+<% end %>
