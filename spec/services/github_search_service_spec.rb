@@ -6,11 +6,33 @@ describe GithubSearchService do
 
   describe '#initialize' do
     let(:search_text) { 'text_text' }
+    context 'when without page' do
+      it do
+        expect(instance.error).to be_nil
+        expect(instance.result).to eq []
+        expect{ instance.search_text }.to raise_error(NoMethodError)
+        expect(instance.send(:search_text)).to eq search_text
+        expect{ instance.page }.to raise_error(NoMethodError)
+        expect(instance.send(:page)).to eq 1
+      end
+    end
 
-    it do
-      expect(instance.error).to be_nil
-      expect(instance.result).to eq []
-      expect{ instance.search_text }.to raise_error(NoMethodError)
+    context 'when valid page' do
+      let(:instance) { described_class.new(search_text, page) }
+      let(:page) { 2 }
+
+      it do
+        expect(instance.send(:page)).to eq 2
+      end
+    end
+
+    context 'when invalid page' do
+      let(:instance) { described_class.new(search_text, page) }
+      let(:page) { 'text' }
+
+      it do
+        expect(instance.send(:page)).to eq 0
+      end
     end
   end
 
@@ -65,8 +87,20 @@ describe GithubSearchService do
   describe '#api_url' do
     let(:search_text) { 'text_text' }
 
-    it do
-      expect(instance.send(:api_url)).to eq "https://api.github.com/search/repositories?q=#{search_text}"
+    context 'when without page' do
+      it do
+        expect(instance.send(:api_url)).to eq "https://api.github.com/search/repositories?q=#{search_text}&page=1"
+      end
+    end
+
+    context 'when with page' do
+      let(:instance) { described_class.new(search_text, page) }
+      let(:page) { 2 }
+
+      it do
+        expect(instance.send(:api_url))
+          .to eq "https://api.github.com/search/repositories?q=#{search_text}&page=#{page}"
+      end
     end
   end
 end

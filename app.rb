@@ -7,9 +7,9 @@ require_relative 'services/github_search_service'
 
 class Application < Sinatra::Base
   get '/' do
-    @search_text = params["search_text"]
+    @search_text, @page = params['search_text'], params['page']
 
-    service = GithubSearchService.new(@search_text)
+    service = GithubSearchService.new(@search_text, @page)
     service.call
 
     @result, @error = service.result, service.error
